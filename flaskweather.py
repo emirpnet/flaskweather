@@ -3,14 +3,15 @@
 # Author : Jochen Peters
 
 from flask import Flask, Blueprint, render_template, request, redirect
+from datetime import datetime, timezone, timedelta
 import requests
 import json
-from datetime import datetime, timezone, timedelta
+import os
 
 
 # Parameters and settings
 VERSION_INFO = {
-	'version_number': '0.9',
+	'version_number': '0.91',
 	'version_date': '2020-10-08'
 }
 LOCATIONS_FILENAME = 'locations.json'
@@ -26,6 +27,9 @@ fw_bp = Blueprint('flaskweather', __name__, template_folder='templates', static_
 # General functions
 
 def load_locations():
+	global LOCATIONS_FILENAME
+	this_folder = os.path.dirname(os.path.abspath(__file__))
+	LOCATIONS_FILENAME = os.path.join(this_folder, LOCATIONS_FILENAME)
 	with open(LOCATIONS_FILENAME, mode='r') as f:
 		dictionary = json.load(f)
 	return dictionary
