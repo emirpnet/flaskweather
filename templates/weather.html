@@ -1,0 +1,143 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ super() }}{% endblock %}
+
+{% block add_to_navbar %}
+{% for loc in locations %}
+{% if loc['active'] %}
+<li><a href="/weather?loc={{ loop.index0 }}">{{ loc['name'] }}</a></li>
+{% endif %}
+{% endfor %}
+{% endblock %}
+
+{% block content %}
+{% if weather_data is not none %}
+
+<h1>{{ weather_data.location_name }}</h1>
+<p class="timestamp">
+{{ weather_data.current.dt | filter_dt(weather_data.timezone_offset, '%Y-%m-%d %H:%M:%S') }} ({{ weather_data.timezone }})<br>
+LAT/LON: {{ weather_data.lat }}&deg; / {{ weather_data.lat }}&deg;<br>
+SR/SS: {{ weather_data.current.sunrise | filter_dt(weather_data.timezone_offset, '%H:%M') }} / {{ weather_data.current.sunset | filter_dt(weather_data.timezone_offset, '%H:%M') }}
+</p>
+
+<div id="current">
+<h2>Current</h2>
+<div id="current_content">
+<table>
+<tr><td>
+{% for w in weather_data.current.weather %}
+{% set icon_src = 'http://openweathermap.org/img/wn/' + w.icon + '.png' %}
+<img src="{{ icon_src }}">
+{% endfor %}
+</td><td>{{ weather_data.current.weather[0].description }}</td></tr>
+<tr><td>Temperature: </td><td>{{ '%.1f' | format(weather_data.current.temp) }} &deg;C</td></tr>
+<tr><td>Humidity: </td><td>{{ weather_data.current.humidity }} %</td></tr>
+<tr><td>Pressure: </td><td>{{ '%.1f' | format(weather_data.current.pressure) }} hPa</td></tr>
+<tr><td>Wind: </td><td>{{ weather_data.current.wind_deg }}&deg; / {{ '%.1f' | format(weather_data.current.wind_speed) }} m/s</td></tr>
+{% if 'alerts' in weather_data %}
+<tr class="alerts"><td>ALERTS: </td><td>
+{% for alert in weather_data.alerts %}
+{{ alert.event }}&nbsp;&nbsp;
+{% endfor %}
+</td></tr>
+{% endif %}
+</table>
+</div>
+</div>
+
+
+<div id="daily">
+<h2>Daily Forecast</h2>
+<div id="daily_content">
+<table>
+{% for dat in weather_data.daily %}
+{% set icon_src = 'http://openweathermap.org/img/wn/' + dat.weather[0].icon + '.png' %}
+<tr>
+<td>{{ dat.dt | filter_dt(weather_data.timezone_offset, '%a, %d.%m.') }}: </td>
+<td><img src="{{ icon_src }}"></td>
+<td>{{ dat.weather[0].description }}</td>
+<td>{{ '%.0f' | format(dat.temp.min) }} / {{ '%.0f' | format(dat.temp.max) }} &deg;C</td>
+<td>{{ '%.1f' | format(dat.wind_speed) }} m/s</td>
+</tr>
+{% endfor %}
+</table>
+</div>
+</div>
+
+
+<div id="hourly">
+<h2>Hourly Forecast</h2>
+<div id="hourly_content">
+<table>
+<tr>
+{% for dat in weather_data.hourly %}
+<th>
+{{ dat.dt | filter_dt(weather_data.timezone_offset, '%a') }}<br>
+{{ dat.dt | filter_dt(weather_data.timezone_offset, '%H:%M') }}
+</th>
+{% endfor %}
+</tr>
+<tr>
+{% for dat in weather_data.hourly %}
+{% set icon_src = 'http://openweathermap.org/img/wn/' + dat.weather[0].icon + '.png' %}
+<td><img src="{{ icon_src }}"></td>
+{% endfor %}
+</tr>
+<tr>
+{% for dat in weather_data.hourly %}
+<td>{{ '%.0f' | format(dat.temp) }} &deg;C</td>
+{% endfor %}
+</tr>
+<tr>
+{% for dat in weather_data.hourly %}
+<td>{{ dat.humidity }} %</td>
+{% endfor %}
+</tr>
+<tr>
+{% for dat in weather_data.hourly %}
+<td>{{ dat.pressure }} hPa</td>
+{% endfor %}
+</tr>
+<tr>
+{% for dat in weather_data.hourly %}
+<td>{{ '%.1f' | format(dat.wind_speed) }} m/s</td>
+{% endfor %}
+</tr>
+<tr>
+{% for dat in weather_data.hourly %}
+
+{% set precipitation = 0 %}
+{% if 'rain' in dat %}
+	{% set precipitation = precipitation + dat.rain['1h'] %}
+{% endif %}
+{% if 'snow' in dat %}
+	{% set precipitation = precipitation + dat.snow['1h'] %}
+{% endif %}
+
+{% if dat['pop'] >= 0.5 %}
+	{% set light_precip_ids = [500, 520, 600, 620] %}
+	{% if dat.weather[0].id in light_precip_ids %}
+		{% set precip_class = "light_precipitation" %}
+	{% else %}
+		{% set precip_class = "precipitation" %}
+	{% endif %}
+{% else %}
+	{% set precip_class = "" %}
+{% endif %}
+
+{% if precipitation > 0 %}
+<td class="{{ precip_class }}">
+{{ '%.0f' | format(dat['pop'] * 100) }} %<br>
+{{ '%.1f' | format(precipitation) }} mm
+</td>
+{% else %}
+<td></td>
+{% endif %}
+{% endfor %}
+</tr>
+</table>
+</div>
+</div>
+
+{% endif %}
+{% endblock %}

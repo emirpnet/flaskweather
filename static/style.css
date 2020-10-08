@@ -1,0 +1,246 @@
+/*
+ * CSS for Flask Weather
+ * Version: 2020-10-08
+ * Author : Jochen Peters
+ */
+
+/* COLOR PALETTE
+ * background: white
+ * text: #56565a
+ * titlebar: navy
+ * hover/focus: darkred / #333333
+ */
+
+
+/* Font family (h1-h5, p, ul, ... and pre as a workaround for a common browser bug) */
+body,h1,h2,h3,h4,h5,p,ul,button { font-family: Helvetica,Arial,sans-serif; }
+pre { font-family: monospace; } /* NOT TO BE USED IN RELATIVE */
+
+
+/* Default margins & general things */
+body {
+	margin: 0;
+	padding: 0;
+	background: white;
+}
+
+p,pre,form {
+	margin: 0;
+	padding: 0;
+}
+
+p.timestamp {
+	margin-top: 0.5em;
+	font-size: 0.8em;
+}
+
+h1 {
+	margin: 0;
+	padding: 0;
+	font-size: 1.2em;
+	font-weight: bold;
+}
+
+h2 {
+	margin: 0.2em 0;
+	padding: 1.4em 0em 0em 0em;
+	font-size: 1.0em;
+	font-weight: bold;
+}
+
+h3 {
+	margin: 2em 0 0.8em 0;
+	padding: 0;
+	font-size: 0.8em;
+	font-weight: bold;
+}
+
+h4,h5 {
+	margin: 0.5em 0;
+	padding: 0;
+	font-size: 0.8em;
+	font-weight: bold;
+}
+
+.content a {
+	text-decoration: none;
+	color: darkred;
+}
+
+.content a:hover {
+	text-decoration: underline;
+}
+
+.content table {
+	margin: 0;
+	padding: 0;
+	font-size: 0.8em;
+}
+
+.content td,tr {
+	padding-right: 0.8em;
+	white-space: nowrap;
+}
+
+.content tr.alerts {
+	color: red;
+}
+
+.content td.light_precipitation {
+	background-color: lightblue;
+}
+
+.content td.precipitation {
+	color: white;
+	background-color: blue;
+}
+
+
+/* Navigation bar */
+.navbar {
+	height: 100%;
+	width: 220px;
+	margin: 0 0 1.5em 0;
+	padding: 0 0.6em;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 1;
+	overflow-x: hidden;
+	color: white;
+	background: navy;
+	border: none;
+}
+
+.navbar label, #hamburger {
+	display: none; /* hide hamburger menu */
+}
+
+.navbar ul.navlinks {
+	display: block; /* show navlinks */
+}
+
+.navbar h1 {
+	margin: 0;
+	padding: 1em 0.6em 0 0.6em;
+	font-size: 1.5em;
+	font-weight: bold;
+}
+
+.navbar ul {
+	margin: 1em 0 0 0;
+	padding: 0;
+	list-style-type: none;
+}
+
+.navbar ul li {
+	display: block;
+	border-top: 1px solid #333333;
+	margin: 0;
+	padding: 1em;
+	box-sizing: border-box;
+	color: white;
+	background: navy;
+}
+
+.navbar li:hover {
+	background: blue;
+}
+
+.navbar a {
+	color: white;
+	text-decoration: none;
+}
+
+
+/* Content */
+div.content {
+	margin: 2em 1em 2em 270px; /* margin-left corresponds to navbar width */
+	padding: 0;
+	text-align: left;
+	color: #56565a;
+	background: white;
+	border: none;
+	font-size: 1.2em;
+	font-weight: normal;
+}
+
+.content a {
+	text-decoration: none;
+	color: #56565a;
+}
+
+.content a:hover {
+	color: blue;
+}
+
+div.content hr {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 1em;
+	margin-bottom: 1em;
+	padding: 0;
+	color: lightgray;
+}
+
+.content:after {
+	clear: both;
+}
+
+div#hourly_content {
+	overflow-x: scroll;
+}
+
+
+@media screen and (max-width: 1201px) { /* on small screens */
+	div.content {
+		margin: 2em 1em 2em 1em;
+		padding: 0;
+	}
+
+	.navbar {
+		height: 100%;
+		width: 100%;
+		margin: 0 0 1.0em 0;
+		padding: 0.6em 0;
+		position: sticky;
+		top: 0;
+		left: 0;
+		z-index: 1;
+		color: white;
+		background: navy;
+		border: none;
+	}
+
+	.navbar label { /* show hamburger */
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 1.5em;
+		height: 1.5em;
+		margin: 0;
+		padding: 0.4em;
+		display: inline-block;
+		color: white;
+		background: #333333;
+		font-size: 1.4em;
+		font-style: normal;
+		text-align: center;
+	}
+
+	.navbar ul.navlinks {
+		display: none;
+	}
+
+	.navbar h1 {
+		margin: 0 3em;
+		padding: 0 0.6em;
+	}
+
+	.navbar ul li {
+		display: block;
+		border-top: 1px solid #333333;
+		background: #333333;
+	}
+}

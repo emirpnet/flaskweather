@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<title>
+{% block title %}Flask Weather{% endblock %}
+</title>
+
+<meta charset="utf-8">
+<meta name="date" content="2020-10-07">
+<meta name="robots" content="noindex, nofollow">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link type="text/css" rel="stylesheet" href="/weather/static/style.css">
+
+<script>
+function toggle_hamburger() {
+	var nav = document.getElementById("navlinks");
+	var txt = document.getElementById("content");
+	if(nav.style.display === "block") {
+		nav.style.display = "none";
+		txt.style.display = "block";
+	} else {
+		nav.style.display = "block";
+		txt.style.display = "none";
+	}
+}
+</script>
+
+{% block add_to_head %}{% endblock %}
+</head>
+
+<body>
+
+<!-- START: navbar //-->
+<div class="navbar">
+<a href="javascript:void(0);" onclick="toggle_hamburger()"><label>&#9776;</label></a>
+<h1><a href="/weather">Weather</a></h1>
+<input type="checkbox" id="hamburger"></input>
+<ul id="navlinks" class="navlinks">
+{% block add_to_navbar %}{% endblock %}
+</ul>
+</div>
+<!-- END: navbar //-->
+
+<div id="content" class="content">
+{% block content %}{% endblock %}
+</div>
+
+</body>
+</html>
