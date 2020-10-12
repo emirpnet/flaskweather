@@ -16,7 +16,7 @@
 <h1>{{ weather_data.location_name }}</h1>
 <p class="timestamp">
 {{ weather_data.current.dt | filter_dt(weather_data.timezone_offset, '%Y-%m-%d %H:%M:%S') }} ({{ weather_data.timezone }})<br>
-LAT/LON: {{ weather_data.lat }}&deg; / {{ weather_data.lat }}&deg;<br>
+LAT/LON: {{ weather_data.lat }}&deg; / {{ weather_data.lon }}&deg;<br>
 SR/SS: {{ weather_data.current.sunrise | filter_dt(weather_data.timezone_offset, '%H:%M') }} / {{ weather_data.current.sunset | filter_dt(weather_data.timezone_offset, '%H:%M') }}
 </p>
 
