@@ -1,6 +1,6 @@
 /*
  * CSS for Flask Weather
- * Version: 2020-10-08
+ * Version: 2020-10-12
  * Author : Jochen Peters
  */
 
@@ -13,7 +13,7 @@
 
 
 /* Font family (h1-h5, p, ul, ... and pre as a workaround for a common browser bug) */
-body,h1,h2,h3,h4,h5,p,ul,button { font-family: Helvetica,Arial,sans-serif; }
+body, h1, h2, h3, h4, h5, p, ul, button { font-family: Helvetica, Arial, sans-serif; }
 pre { font-family: monospace; } /* NOT TO BE USED IN RELATIVE */
 
 
@@ -24,7 +24,7 @@ body {
 	background: white;
 }
 
-p,pre,form {
+p, pre, form {
 	margin: 0;
 	padding: 0;
 }
@@ -55,7 +55,7 @@ h3 {
 	font-weight: bold;
 }
 
-h4,h5 {
+h4, h5 {
 	margin: 0.5em 0;
 	padding: 0;
 	font-size: 0.8em;
@@ -77,7 +77,7 @@ h4,h5 {
 	font-size: 0.8em;
 }
 
-.content td,tr {
+.content td, tr {
 	padding-right: 0.8em;
 	white-space: nowrap;
 }
@@ -197,6 +197,10 @@ div#hourly_content {
 	div.content {
 		margin: 2em 1em 2em 1em;
 		padding: 0;
+	}
+
+	div#daily_content, div#hourly_content {
+		overflow-x: scroll;
 	}
 
 	.navbar {
