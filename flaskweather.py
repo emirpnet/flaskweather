@@ -7,17 +7,17 @@ from datetime import datetime, timezone, timedelta
 import requests
 import json
 import os
+from dotenv import load_dotenv
 
 
 # Parameters and settings
 VERSION_INFO = {
-	'version_number': '0.91',
-	'version_date': '2020-10-08'
+	'version_number': '0.92',
+	'version_date': '2020-11-14'
 }
 LOCATIONS_FILENAME = 'locations.json'
 OWM_API_URL = 'https://api.openweathermap.org/data/2.5/onecall'
 OWM_ICON_URL = 'http://openweathermap.org/img/wn/'
-OWM_API_KEY = '123abc' # TODO: remove key before git commit(!)
 
 
 # Global variables
@@ -49,7 +49,7 @@ def sanitize_location_idx(locations, idx):
 	return loc_idx
 
 def fetch_weather_data(lat, lon):
-	url = OWM_API_URL + '?units=metric&lat=' + str(lat) + '&lon=' + str(lon) + '&appid=' + OWM_API_KEY
+	url = OWM_API_URL + '?units=metric&lat=' + str(lat) + '&lon=' + str(lon) + '&appid=' + os.environ['OWM_API_KEY']
 	response = requests.get(url)
 	if response.ok:
 		return response.json()
@@ -66,6 +66,7 @@ def load_test_weather_data(filename): # for TESTING
 
 @fw_bp.route('/weather')
 def weather():
+	load_dotenv()
 	locations = load_locations()
 	loc_idx = sanitize_location_idx(locations, request.args.get('loc'))
 	if loc_idx is None:
