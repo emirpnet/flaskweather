@@ -1,5 +1,5 @@
 # load_dotenv.py
-# Version: 0.2 (2020-11-14)
+# Version: 0.21 (2020-11-14)
 # Author: Jochen Peters
 
 import sys, os
@@ -35,6 +35,8 @@ def parse_dotenv(lines):
 	for line_number, s in enumerate(lines):
 		# ignore stuff
 		s = s.strip()
+		if len(s) < 2: # at least a key and an equal sign
+			continue
 		if s[0] == '#': # ignore comment lines
 			continue
 		if s.count('=') != 1: # ignore lines with no or more than one equal sign
