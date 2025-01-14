@@ -12,12 +12,14 @@ from lib.dotenv import load_dotenv
 
 # Parameters and settings
 VERSION_INFO = {
-	'version_number': '0.93',
-	'version_date': '2020-11-14'
+	'version_number': '0.9.5',
+	'version_date': '2025-01-14'
 }
 DOTENV_FILENAME = '.env'
 LOCATIONS_FILENAME = 'locations.json'
-OWM_API_URL = 'https://api.openweathermap.org/data/2.5/onecall'
+OWM_API_URL = {}
+OWM_API_URL['WEATHER'] = 'https://api.openweathermap.org/data/2.5/weather'
+OWM_API_URL['FORECAST'] = 'https://api.openweathermap.org/data/2.5/forecast'
 OWM_ICON_URL = 'http://openweathermap.org/img/wn/'
 
 
@@ -31,6 +33,7 @@ def load_locations():
 	global LOCATIONS_FILENAME
 	this_folder = os.path.dirname(os.path.abspath(__file__))
 	LOCATIONS_FILENAME = os.path.join(this_folder, LOCATIONS_FILENAME)
+	dictionary = None
 	with open(LOCATIONS_FILENAME, mode='r') as f:
 		dictionary = json.load(f)
 	return dictionary
@@ -49,8 +52,10 @@ def sanitize_location_idx(locations, idx):
 
 	return loc_idx
 
-def fetch_weather_data(lat, lon):
-	url = OWM_API_URL + '?units=metric&lat=' + str(lat) + '&lon=' + str(lon) + '&appid=' + os.environ['OWM_API_KEY']
+def fetch_weather_data(api, lat, lon):
+	if not api in OWM_API_URL:
+		return None
+	url = OWM_API_URL[api] + '?units=metric&lat=' + str(lat) + '&lon=' + str(lon) + '&appid=' + os.environ['OWM_API_KEY']
 	response = requests.get(url)
 	if response.ok:
 		return response.json()
@@ -72,14 +77,26 @@ def weather():
 	DOTENV_FILENAME = os.path.join(this_folder, DOTENV_FILENAME)
 	load_dotenv(DOTENV_FILENAME)
 	locations = load_locations()
+	if locations is None:
+		return "no locations"
 	loc_idx = sanitize_location_idx(locations, request.args.get('loc'))
 	if loc_idx is None:
 		return redirect('/weather?loc=0')
 
-	weather_data = fetch_weather_data(locations[loc_idx]['lat'], locations[loc_idx]['lon'])
-	weather_data['updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-	weather_data['location_name'] = locations[loc_idx]['name']
+	data_current = fetch_weather_data('WEATHER', locations[loc_idx]['lat'], locations[loc_idx]['lon'])
+	if data_current is None:
+		return "no weather data"
+	data_forecast = fetch_weather_data('FORECAST', locations[loc_idx]['lat'], locations[loc_idx]['lon'])
+	if data_forecast is None:
+		return "no forecast data"
 
+	weather_data = {
+		'location_name': locations[loc_idx]['name'],
+		'updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+		'current': data_current,
+		'forecast': data_forecast
+	}
+	#return weather_data # DEBUG
 	return render_template('weather.html', locations=locations, weather_data=weather_data)
 
 

@@ -15,105 +15,56 @@
 
 <h1>{{ weather_data.location_name }}</h1>
 <p class="timestamp">
-{{ weather_data.current.dt | filter_dt(weather_data.timezone_offset, '%Y-%m-%d %H:%M:%S') }} ({{ weather_data.timezone }})<br>
-LAT/LON: {{ weather_data.lat }}&deg; / {{ weather_data.lon }}&deg;<br>
-SR/SS: {{ weather_data.current.sunrise | filter_dt(weather_data.timezone_offset, '%H:%M') }} / {{ weather_data.current.sunset | filter_dt(weather_data.timezone_offset, '%H:%M') }}
+{{ weather_data.current.dt | filter_dt(weather_data.current.timezone, '%Y-%m-%d %H:%M:%S') }}<br>
+LAT/LON: {{ weather_data.current.coord.lat }}&deg; / {{ weather_data.current.coord.lon }}&deg;<br>
+SR/SS: {{ weather_data.current.sys.sunrise | filter_dt(weather_data.current.timezone, '%H:%M') }} / {{ weather_data.current.sys.sunset | filter_dt(weather_data.current.timezone, '%H:%M') }}
 </p>
 
 <div id="current">
 <h2>Current</h2>
 <div id="current_content">
-<table>
-<tr><td>
-{% for w in weather_data.current.weather %}
-{% set icon_src = 'http://openweathermap.org/img/wn/' + w.icon + '.png' %}
-<img src="{{ icon_src }}">
-{% endfor %}
-</td><td>{{ weather_data.current.weather[0].description }}</td></tr>
-<tr><td>Temperature: </td><td>{{ '%.1f' | format(weather_data.current.temp) }} &deg;C</td></tr>
-<tr><td>Humidity: </td><td>{{ weather_data.current.humidity }} %</td></tr>
-<tr><td>Pressure: </td><td>{{ '%.1f' | format(weather_data.current.pressure) }} hPa</td></tr>
-<tr><td>Wind: </td><td>{{ weather_data.current.wind_deg }}&deg; / {{ '%.1f' | format(weather_data.current.wind_speed) }} m/s</td></tr>
-{% if 'alerts' in weather_data %}
-<tr class="alerts"><td>ALERTS: </td><td>
-{% for alert in weather_data.alerts %}
-{{ alert.event }}&nbsp;&nbsp;
-{% endfor %}
-</td></tr>
+{% set icon_src = 'http://openweathermap.org/img/wn/' + weather_data.current.weather[0].icon + '.png' %}
+
+{% set current_precip = 0 %}
+{% if 'rain' in weather_data.current %}
+	{% set current_precip = current_precip + weather_data.current.rain['1h'] %}
 {% endif %}
+{% if 'snow' in weather_data.current %}
+	{% set current_precip = current_precip + weather_data.current.snow['1h'] %}
+{% endif %}
+
+<table>
+<tr>
+<td><img src="{{ icon_src }}"></td>
+<td>{{ weather_data.current.weather[0].description }} {% if current_precip > 0 %}({{ '%.1f' | format(current_precip) }} mm/h){% endif %}</td>
+</tr>
+<tr><td>Temperature: </td><td>{{ '%.1f' | format(weather_data.current.main.temp) }}&deg;C</td></tr>
+<tr><td>Feels like: </td><td>{{ '%.1f' | format(weather_data.current.main.feels_like) }}&deg;C</td></tr>
+<tr><td>Humidity: </td><td>{{ weather_data.current.main.humidity }}&percnt;</td></tr>
+<tr><td>Pressure: </td><td>{{ '%.1f' | format(weather_data.current.main.pressure) }} hPa</td></tr>
+<tr><td>Wind: </td><td>{{ weather_data.current.wind.deg }}&deg; / {{ '%.1f' | format(weather_data.current.wind.speed) }}{% if 'gust' in weather_data.current.wind %} ~{{ '%.1f' | format(weather_data.current.wind.gust) }}{% endif %} m/s</td></tr>
 </table>
 </div>
 </div>
 
-
-<div id="daily">
-<h2>Daily Forecast</h2>
+<div id="forecast">
+<h2>Forecast</h2>
 <div id="daily_content">
 <table>
-{% for dat in weather_data.daily %}
+<tr><th>Date/Time</th><th colspan="2">Weather</th><th>Temp.</th><th>Humid.</th><th>Precip. (mm/h)</th><th>Pressure (hPa)</th><th>Wind (m/s)</th></tr>
+
+{% for dat in weather_data.forecast.list %}
 {% set icon_src = 'http://openweathermap.org/img/wn/' + dat.weather[0].icon + '.png' %}
-<tr>
-<td>{{ dat.dt | filter_dt(weather_data.timezone_offset, '%a, %d.%m.') }}: </td>
-<td><img src="{{ icon_src }}"></td>
-<td>{{ dat.weather[0].description }}</td>
-<td>{{ '%.0f' | format(dat.temp.min) }} / {{ '%.0f' | format(dat.temp.max) }} &deg;C</td>
-<td>{{ '%.1f' | format(dat.wind_speed) }} m/s</td>
-</tr>
-{% endfor %}
-</table>
-</div>
-</div>
 
-
-<div id="hourly">
-<h2>Hourly Forecast</h2>
-<div id="hourly_content">
-<table>
-<tr>
-{% for dat in weather_data.hourly %}
-<th>
-{{ dat.dt | filter_dt(weather_data.timezone_offset, '%a') }}<br>
-{{ dat.dt | filter_dt(weather_data.timezone_offset, '%H:%M') }}
-</th>
-{% endfor %}
-</tr>
-<tr>
-{% for dat in weather_data.hourly %}
-{% set icon_src = 'http://openweathermap.org/img/wn/' + dat.weather[0].icon + '.png' %}
-<td><img src="{{ icon_src }}"></td>
-{% endfor %}
-</tr>
-<tr>
-{% for dat in weather_data.hourly %}
-<td>{{ '%.0f' | format(dat.temp) }} &deg;C</td>
-{% endfor %}
-</tr>
-<tr>
-{% for dat in weather_data.hourly %}
-<td>{{ dat.humidity }} %</td>
-{% endfor %}
-</tr>
-<tr>
-{% for dat in weather_data.hourly %}
-<td>{{ dat.pressure }} hPa</td>
-{% endfor %}
-</tr>
-<tr>
-{% for dat in weather_data.hourly %}
-<td>{{ '%.1f' | format(dat.wind_speed) }} m/s</td>
-{% endfor %}
-</tr>
-<tr>
-{% for dat in weather_data.hourly %}
-
-{% set precipitation = 0 %}
+{% set precip_fc = 0 %}
 {% if 'rain' in dat %}
-	{% set precipitation = precipitation + dat.rain['1h'] %}
+	{% set precip_fc = precip_fc + dat.rain['3h'] %}
 {% endif %}
 {% if 'snow' in dat %}
-	{% set precipitation = precipitation + dat.snow['1h'] %}
+	{% set precip_fc = precip_fc + dat.snow['3h'] %}
 {% endif %}
 
+{% set precip_class = "" %}
 {% if dat['pop'] >= 0.5 %}
 	{% set light_precip_ids = [500, 520, 600, 620] %}
 	{% if dat.weather[0].id in light_precip_ids %}
@@ -121,23 +72,25 @@ SR/SS: {{ weather_data.current.sunrise | filter_dt(weather_data.timezone_offset,
 	{% else %}
 		{% set precip_class = "precipitation" %}
 	{% endif %}
-{% else %}
-	{% set precip_class = "" %}
 {% endif %}
 
-{% if precipitation > 0 %}
-<td class="{{ precip_class }}">
-{{ '%.0f' | format(dat['pop'] * 100) }} %<br>
-{{ '%.1f' | format(precipitation) }} mm
-</td>
-{% else %}
+<tr>
+<td>{{ dat.dt | filter_dt(weather_data.forecast.city.timezone, '%a, %d.%m. %H:%M') }}</td>
+<td><img src="{{ icon_src }}"></td>
+<td class="{{ precip_class }}">{{ dat.weather[0].description }}</td>
+<td>{{ '%.0f' | format(dat.main.temp) }}&deg;C</td>
+<td>{{ '%.0f' | format(dat.main.humidity) }}&percnt;</td>
+<td>{{ '%.1f' | format(precip_fc) }} ({{ '%.0f' | format(dat['pop'] * 100) }}&percnt;)</td>
+<td>{{ '%.0f' | format(dat.main.pressure) }}</td>
+<td>{{ '%.1f' | format(dat.wind.speed) }} {% if 'gust' in dat.wind %}~{{ '%.1f' | format(dat.wind.gust) }}{% endif %}</td>
 <td></td>
-{% endif %}
-{% endfor %}
 </tr>
+
+{% endfor %}
 </table>
 </div>
 </div>
 
 {% endif %}
 {% endblock %}
+
