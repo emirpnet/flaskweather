@@ -42,7 +42,7 @@ SR/SS: {{ weather_data.current.sys.sunrise | filter_dt(weather_data.current.time
 <tr><td>Feels like: </td><td>{{ '%.1f' | format(weather_data.current.main.feels_like) }}&deg;C</td></tr>
 <tr><td>Humidity: </td><td>{{ weather_data.current.main.humidity }}&percnt;</td></tr>
 <tr><td>Pressure: </td><td>{{ '%.1f' | format(weather_data.current.main.pressure) }} hPa</td></tr>
-<tr><td>Wind: </td><td>{{ weather_data.current.wind.deg }}&deg; / {{ '%.1f' | format(weather_data.current.wind.speed) }}{% if 'gust' in weather_data.current.wind %} ~{{ '%.1f' | format(weather_data.current.wind.gust) }}{% endif %} m/s</td></tr>
+<tr><td>Wind: </td><td>{{ weather_data.current.wind.deg }}&deg; / {{ '%.1f' | format(weather_data.current.wind.speed) }}{% if 'gust' in weather_data.current.wind %}~{{ '%.1f' | format(weather_data.current.wind.gust) }}{% endif %} m/s</td></tr>
 </table>
 </div>
 </div>
@@ -51,7 +51,7 @@ SR/SS: {{ weather_data.current.sys.sunrise | filter_dt(weather_data.current.time
 <h2>Forecast</h2>
 <div id="daily_content">
 <table>
-<tr><th>Date/Time</th><th colspan="2">Weather</th><th>Temp.</th><th>Humid.</th><th>Precip. (mm/h)</th><th>Pressure (hPa)</th><th>Wind (m/s)</th></tr>
+<tr><th>Date/Time</th><th colspan="2">Weather</th><th>Temp.</th><th>Humid.</th><th>Precip.</th><th>Pressure</th><th>Wind</th></tr>
 
 {% for dat in weather_data.forecast.list %}
 {% set icon_src = 'http://openweathermap.org/img/wn/' + dat.weather[0].icon + '.png' %}
@@ -80,9 +80,9 @@ SR/SS: {{ weather_data.current.sys.sunrise | filter_dt(weather_data.current.time
 <td class="{{ precip_class }}">{{ dat.weather[0].description }}</td>
 <td>{{ '%.0f' | format(dat.main.temp) }}&deg;C</td>
 <td>{{ '%.0f' | format(dat.main.humidity) }}&percnt;</td>
-<td>{{ '%.1f' | format(precip_fc) }} ({{ '%.0f' | format(dat['pop'] * 100) }}&percnt;)</td>
-<td>{{ '%.0f' | format(dat.main.pressure) }}</td>
-<td>{{ '%.1f' | format(dat.wind.speed) }} {% if 'gust' in dat.wind %}~{{ '%.1f' | format(dat.wind.gust) }}{% endif %}</td>
+<td>{{ '%.0f' | format(dat['pop'] * 100) }}&percnt; / {{ '%.1f' | format(precip_fc) }}</td>
+<td>{{ '%.1f' | format(dat.main.pressure) }}</td>
+<td>{{ '%.1f' | format(dat.wind.speed) }}{% if 'gust' in dat.wind %}~{{ '%.1f' | format(dat.wind.gust) }}{% endif %}</td>
 <td></td>
 </tr>
 
