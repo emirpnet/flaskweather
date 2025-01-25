@@ -24,25 +24,16 @@ SR/SS: {{ weather_data.current.sys.sunrise | filter_dt(weather_data.current.time
 <h2>Current</h2>
 <div id="current_content">
 {% set icon_src = 'http://openweathermap.org/img/wn/' + weather_data.current.weather[0].icon + '.png' %}
-
-{% set current_precip = 0 %}
-{% if 'rain' in weather_data.current %}
-	{% set current_precip = current_precip + weather_data.current.rain['1h'] %}
-{% endif %}
-{% if 'snow' in weather_data.current %}
-	{% set current_precip = current_precip + weather_data.current.snow['1h'] %}
-{% endif %}
-
 <table>
 <tr>
 <td><img src="{{ icon_src }}"></td>
-<td>{{ weather_data.current.weather[0].description }} {% if current_precip > 0 %}({{ '%.1f' | format(current_precip) }} mm/h){% endif %}</td>
+<td>{{ weather_data.current.weather[0].description }} {% if weather_data.current.fw_precip_sum > 0 %}({{ '%.1f' | format(weather_data.current.fw_precip_sum) }} mm/h){% endif %}</td>
 </tr>
 <tr><td>Temperature: </td><td>{{ '%.1f' | format(weather_data.current.main.temp) }}&deg;C</td></tr>
 <tr><td>Feels like: </td><td>{{ '%.1f' | format(weather_data.current.main.feels_like) }}&deg;C</td></tr>
 <tr><td>Humidity: </td><td>{{ weather_data.current.main.humidity }}&percnt;</td></tr>
 <tr><td>Pressure: </td><td>{{ '%.1f' | format(weather_data.current.main.pressure) }} hPa</td></tr>
-<tr><td>Wind: </td><td>{{ weather_data.current.wind.deg }}&deg; / {{ '%.1f' | format(weather_data.current.wind.speed) }}{% if 'gust' in weather_data.current.wind %}~{{ '%.1f' | format(weather_data.current.wind.gust) }}{% endif %} m/s</td></tr>
+<tr><td>Wind: </td><td>{{ weather_data.current.wind.deg }}&deg; / {{ '%.1f' | format(weather_data.current.wind.speed) }}{% if weather_data.current.fw_show_gust %}~{{ '%.1f' | format(weather_data.current.wind.gust) }}{% endif %} m/s</td></tr>
 </table>
 </div>
 </div>
@@ -52,40 +43,19 @@ SR/SS: {{ weather_data.current.sys.sunrise | filter_dt(weather_data.current.time
 <div id="daily_content">
 <table>
 <tr><th>Date/Time</th><th colspan="2">Weather</th><th>Temp.</th><th>Humid.</th><th>Precip.</th><th>Pressure</th><th>Wind</th></tr>
-
 {% for dat in weather_data.forecast.list %}
 {% set icon_src = 'http://openweathermap.org/img/wn/' + dat.weather[0].icon + '.png' %}
-
-{% set precip_fc = 0 %}
-{% if 'rain' in dat %}
-	{% set precip_fc = precip_fc + dat.rain['3h'] %}
-{% endif %}
-{% if 'snow' in dat %}
-	{% set precip_fc = precip_fc + dat.snow['3h'] %}
-{% endif %}
-
-{% set precip_class = "" %}
-{% if dat['pop'] >= 0.5 %}
-	{% set light_precip_ids = [500, 520, 600, 620] %}
-	{% if dat.weather[0].id in light_precip_ids %}
-		{% set precip_class = "light_precipitation" %}
-	{% else %}
-		{% set precip_class = "precipitation" %}
-	{% endif %}
-{% endif %}
-
 <tr>
 <td>{{ dat.dt | filter_dt(weather_data.forecast.city.timezone, '%a, %d.%m. %H:%M') }}</td>
 <td><img src="{{ icon_src }}"></td>
-<td class="{{ precip_class }}">{{ dat.weather[0].description }}</td>
+<td class="{{ dat.fw_precip_class }}">{{ dat.weather[0].description }}</td>
 <td>{{ '%.0f' | format(dat.main.temp) }}&deg;C</td>
 <td>{{ '%.0f' | format(dat.main.humidity) }}&percnt;</td>
-<td>{{ '%.0f' | format(dat['pop'] * 100) }}&percnt; / {{ '%.1f' | format(precip_fc) }}</td>
+<td>{{ '%.0f' | format(dat['pop'] * 100) }}&percnt; / {{ '%.1f' | format(dat.fw_precip_sum) }}</td>
 <td>{{ '%.1f' | format(dat.main.pressure) }}</td>
-<td>{{ '%.1f' | format(dat.wind.speed) }}{% if 'gust' in dat.wind %}~{{ '%.1f' | format(dat.wind.gust) }}{% endif %}</td>
+<td>{{ '%.1f' | format(dat.wind.speed) }}{% if dat.fw_show_gust %}~{{ '%.1f' | format(dat.wind.gust) }}{% endif %}</td>
 <td></td>
 </tr>
-
 {% endfor %}
 </table>
 </div>

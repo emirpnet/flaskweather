@@ -1,6 +1,6 @@
 /*
  * CSS for Flask Weather
- * Version: 2020-10-12
+ * Version: 2025-01-25
  * Author : Jochen Peters
  */
 
@@ -86,13 +86,21 @@ h4, h5 {
 	color: red;
 }
 
-.content td.light_precipitation {
+.content td.light_rain {
 	background-color: lightblue;
 }
 
-.content td.precipitation {
+.content td.rain {
 	color: white;
 	background-color: blue;
+}
+
+.content td.light_snow {
+	background-color: #F0F0F0;
+}
+
+.content td.snow {
+	background-color: #E0E0E0;
 }
 
 
